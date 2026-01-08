@@ -4,22 +4,23 @@
 """
 
 from utils.db import db
-from models import Credential, Student, Teacher
+from models import Credential, Student, Teacher, Subject, Grade
 from datetime import date
-from sqlite3 import connect, Row
 
 
 def init_database():
     """データベーステーブルの作成とテストデータの挿入"""
     
     # テーブル作成
-    db.create_tables([Credential, Student, Teacher], safe=True)
+    db.create_tables([Credential, Student, Teacher, Subject, Grade], safe=True)
     print("✓ テーブルが作成されました")
     
     # 既存データを削除（開発環境用）
     Credential.delete().execute()
     Student.delete().execute()
     Teacher.delete().execute()
+    Subject.delete().execute()
+    Grade.delete().execute()
     print("✓ 既存データをリセットしました")
     
     # テスト用学生データ
@@ -89,6 +90,62 @@ def init_database():
         }
     ]
     
+    # =========================
+    # テスト用科目データ
+    # =========================
+    test_subjects = [
+        {
+            'name': 'プログラミング基礎',
+            'major': '情報科学科',
+            'category': 'required',
+            'grade': 1,
+            'credits': 2,
+            'day': '月',
+            'period': 1,
+        },
+        {
+            'name': 'データベース概論',
+            'major': '情報科学科',
+            'category': 'required',
+            'grade': 2,
+            'credits': 2,
+            'day': '火',
+            'period': 3,
+        },
+        {
+            'name': 'アルゴリズム',
+            'major': '情報科学科',
+            'category': 'required',
+            'grade': 2,
+            'credits': 3,
+            'day': '水',
+            'period': 2,
+        },
+        {
+            'name': 'Webアプリケーション開発',
+            'major': '情報科学科',
+            'category': 'elective',
+            'grade': 3,
+            'credits': 2,
+            'day': '木',
+            'period': 4,
+        },
+        {
+            'name': '人工知能入門',
+            'major': '情報科学科',
+            'category': 'elective',
+            'grade': 3,
+            'credits': 2,
+            'day': '金',
+            'period': 5,
+        },
+    ]
+
+    for subject_data in test_subjects:
+        Subject.create(**subject_data)
+        print(f"✓ 科目作成: {subject_data['name']} ({subject_data['day']}{subject_data['period']}限)")
+
+    
     # 認証情報の作成
     for cred_data in test_credentials:
         Credential.create(**cred_data)
@@ -105,26 +162,3 @@ def init_database():
 
 if __name__ == '__main__':
     init_database()
-
-    DB_PATH = 'database.db'
-
-    conn = connect(DB_PATH)
-    cur = conn.cursor()
-
-    cur.execute("""
-    CREATE TABLE IF NOT EXISTS subjects (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,          -- 科目名
-        major TEXT NOT NULL,         -- 専攻
-        category TEXT NOT NULL,      -- 単位区分（required / elective）
-        grade INTEGER NOT NULL,      -- 対象学年
-        credits INTEGER NOT NULL,    -- 単位数
-        day TEXT NOT NULL,           -- 曜日（月・火など）
-        period INTEGER NOT NULL      -- 時間（1〜6）
-    )
-    """)
-
-    conn.commit()
-    conn.close()
-
-    print("database.db と subjects テーブルを作成しました（最新版仕様）")

@@ -105,7 +105,7 @@ class Teacher(Model):
 
 
 # 互換性のため User エイリアスを提供
-class User:
+class User(Credential):
     """
     認証用のエイリアスクラス。
     ログイン処理で Credential を User として扱うために使用。
