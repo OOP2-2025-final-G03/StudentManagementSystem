@@ -59,12 +59,5 @@ def grades_role(role_type):
         abort(404)
     return redirect(url_for('grade.list', role_type=role_type))
 
-
-def initialize_database():
-    db.connect(reuse_if_open=True)
-    db.create_tables([Grade], safe=True)  # safe=True で「既にあれば作らない」
-    db.close()
-
 if __name__ == '__main__':
-    initialize_database()
     app.run(host=Config.HOST, port=Config.PORT, debug=Config.DEBUG)
