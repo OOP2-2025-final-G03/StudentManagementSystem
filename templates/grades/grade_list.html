@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>成績データ一覧</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base-style.css') }}">
+</head>
+<body>
+    <h1>{{ title }}</h1>
+    <ul class="breadcrumb">
+        <li><a href="{{ url_for('index') }}">HOME</a></li>
+        <li><a href="{{ url_for('grade.list') }}">成績一覧</a></li>
+    </ul>
+
+    <a href="{{ url_for('grade.add') }}">新規成績追加</a>
+    <table>
+        <thead>
+            <tr>
+                <th>&nbsp;</th>
+                <th>ID</th>
+                <th>学籍番号</th>
+                <th>科目ID</th>
+                <th>単位数</th>
+                <th>評定</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for grade in items %}
+            <tr>
+                <td><a href="{{ url_for('grade.edit', grade_id=grade.id) }}">編集</a></td>
+                <td>{{ grade.id }}</td>
+                <td>{{ grade.student_number }}</td>
+                <td>{{ grade.subject_id }}</td>
+                <td>{{ grade.unit }}</td>
+                <td>{{ grade.score }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
