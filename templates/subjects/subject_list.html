@@ -6,7 +6,7 @@
 
 <style>
   /* 科目の種類を示すバッジ */
-  .type-badge {
+  .category {
     display: inline-block;
     padding: 2px 8px;
     border-radius: 6px;
@@ -15,26 +15,76 @@
   }
 
   /* 必修科目: 橙色/黄色 */
-  .type-required {
+  .category-required {
     background-color: rgba(249, 115, 22, 0.1);
     color: #c2410c;
   }
-  [data-theme="dark"] .type-required {
+  [data-theme="dark"] .category-required {
     color: #fb923c;
   }
 
   /* 選択科目: 蓝色 */
-  .type-elective {
+  .category-elective {
     background-color: rgba(14, 165, 233, 0.1);
     color: #0284c7;
   }
-  [data-theme="dark"] .type-elective {
+  [data-theme="dark"] .category-elective {
     color: #38bdf8;
   }
 
   .credit-num {
     font-weight: 600;
     color: var(--text-main);
+  }
+
+  .search-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .search-box input {
+    height: 36px;
+    padding: 0 12px;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    min-width: 240px;
+  }
+
+  .btn-search {
+    appearance: none;
+    outline: none;
+    cursor: pointer;
+
+    height: 36px;
+    padding: 0 14px;
+    font-size: 13px;
+    font-weight: 600;
+
+    color: #ffffff;
+    background-color: var(--primary-color);
+    border-radius: 8px;
+    border: none;
+
+    box-shadow: var(--shadow-sm);
+    transition: all var(--anim-fast);
+
+    writing-mode: horizontal-tb;
+    white-space: nowrap;
+    line-height: 1;
+  }
+
+  /* hover */
+  .btn-search:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(26, 26, 26, 0.25);
+  }
+
+  /* active */
+  .btn-search:active {
+    transform: translateY(0) scale(0.98);
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.08);
   }
 </style>
 {% endblock %} {% block page_title %}科目管理{% endblock %} {% block
@@ -45,32 +95,43 @@ dashboard_content %}
     <p>カリキュラムや担当教員、単位数を管理します。</p>
   </div>
 
-  {% set current_type = request.args.get('type', 'all') %}
+  {% set current_category = request.args.get('category', 'all') %}
   <div class="filter-tabs">
     <a
-      href="{{ url_for('subject.list', type='all') }}"
-      class="filter-tab {{ 'active' if current_type == 'all' else '' }}"
+      href="{{ url_for('subject.list', category='all') }}"
+      class="filter-tab {{ 'active' if current_category == 'all' else '' }}"
     >
       すべて
     </a>
     <a
-      href="{{ url_for('subject.list', type='required') }}"
-      class="filter-tab {{ 'active' if current_type == 'required' else '' }}"
+      href="{{ url_for('subject.list', category='required') }}"
+      class="filter-tab {{ 'active' if current_category == 'required' else '' }}"
     >
       必修科目
     </a>
     <a
-      href="{{ url_for('subject.list', type='elective') }}"
-      class="filter-tab {{ 'active' if current_type == 'elective' else '' }}"
+      href="{{ url_for('subject.list', category='elective') }}"
+      class="filter-tab {{ 'active' if current_category == 'elective' else '' }}"
     >
       選択科目
     </a>
   </div>
 
   <div class="list-actions">
-    <div class="search-box">
-      <input type="text" placeholder="科目名、担当教員で検索..." />
-    </div>
+    <form
+      method="get"
+      action="{{ url_for('subject.list') }}"
+      class="search-box"
+    >
+      <input
+        type="text"
+        name="keyword"
+        placeholder="科目名・専攻で検索..."
+        value="{{ request.args.get('keyword', '') }}"
+      />
+
+      <button type="submit" class="btn-search">検索</button>
+    </form>
 
     {% if role in ['admin', 'teacher'] %}
     <a href="{{ url_for('subject.create') }}" class="btn-add"> 新規科目 </a>
@@ -81,12 +142,13 @@ dashboard_content %}
     <table class="styled-table">
       <thead>
         <tr>
-          <th width="100">科目ID</th>
+          <th width="80">ID</th>
           <th>科目名</th>
+          <th>専攻</th>
           <th>区分</th>
+          <th>対象学年</th>
           <th>単位数</th>
-          <th>担当教員</th>
-          <th>開講時期</th>
+          <th>開講日時</th>
           <th width="160">操作</th>
         </tr>
       </thead>
@@ -99,23 +161,21 @@ dashboard_content %}
             {{ sub.name }}
           </td>
 
+          <td>{{ sub.major }}</td>
+
           <td>
             <span
-              class="type-badge {{ 'type-required' if sub.type == 'required' else 'type-elective' }}"
+              class="category {{ 'category-required' if sub.category == 'required' else 'category-elective' }}"
             >
-              {{ '必修' if sub.type == 'required' else '選択' }}
+              {{ '必修' if sub.category == 'required' else '選択' }}
             </span>
           </td>
+
+          <td>{{ sub.grade }} 年</td>
 
           <td><span class="credit-num">{{ sub.credits }}</span> 単位</td>
 
-          <td>{{ sub.teacher }}</td>
-
-          <td>
-            <span style="font-size: 0.85rem; color: var(--text-sub)">
-              {{ sub.schedule }}
-            </span>
-          </td>
+          <td>{{ sub.day }} {{ sub.period }}限</td>
 
           <td>
             {% if role in ['admin', 'teacher'] %}
@@ -140,7 +200,7 @@ dashboard_content %}
         {% endfor %} {% else %}
         <tr>
           <td
-            colspan="7"
+            colspan="8"
             style="text-align: center; padding: 40px; color: #94a3b8"
           >
             データが見つかりませんでした。
