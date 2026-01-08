@@ -1,5 +1,5 @@
 from peewee import Model, CharField, IntegerField
-from .db import db
+from utils import db
 
 class Grade(Model):
     student_number = CharField()    # 学籍番号

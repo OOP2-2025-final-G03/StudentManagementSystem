@@ -3,7 +3,7 @@ from peewee import (
     CharField,
     DateField
 )
-from utils.db import db
+from utils import db
 
 
 class User(Model):
