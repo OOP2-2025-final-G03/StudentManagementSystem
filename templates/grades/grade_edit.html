@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>成績情報編集</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base-style.css') }}">
+</head>
+<body>
+    <h1>成績情報を編集</h1>
+    <ul class="breadcrumb">
+        <li><a href="{{ url_for('index') }}">HOME</a></li>
+        <li><a href="{{ url_for('grade.list') }}">成績一覧</a></li>
+        <li>成績情報編集</li>
+    </ul>
+
+    <form action="{{ url_for('grade.edit', grade_id=grade.id) }}" method="post">
+        <label>学籍番号: <input type="text" name="student_number" value="{{ grade.student_number }}" autocomplete="off" required></label><br>
+        <label>科目ID: <input type="text" name="subject_id" value="{{ grade.subject_id }}" autocomplete="off" required></label><br>
+        <label>単位数: <input type="number" name="unit" min="0" max="10" value="{{ grade.unit }}" required></label><br>
+        <label>評定: <input type="text" name="score" value="{{ grade.score }}" autocomplete="off" required></label><br>
+        <button type="submit">保存</button>
+    </form>
+</body>
+</html>
