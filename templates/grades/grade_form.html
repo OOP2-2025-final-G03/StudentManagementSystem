@@ -1,0 +1,93 @@
+{% extends active_template %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/list.css') }}">
+{% endblock %}
+
+{% block page_title %}成績管理{% endblock %}
+
+{% block main_content %}
+    <div class="list-card">
+
+        <div class="list-header">
+            <h2>{{ title }}</h2>
+            <p>{{ '成績を登録します。' if mode == 'create' else '成績を編集します。' }}</p>
+        </div>
+
+        <div class="list-actions">
+            <a href="{{ url_for('grade.list') }}" class="action-link edit-link">
+                一覧に戻る
+            </a>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div>
+                    {% for category, message in messages %}
+                        <p>{{ message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST"
+              action="{% if mode == 'edit' and grade is defined %}
+                          {{ url_for('grade.edit', student_number=grade.student_number, subject_id=grade.subject_id) }}
+                      {% else %}
+                          {{ url_for('grade.create') }}
+                      {% endif %}">
+
+            {# 既存CSSだけで整えるため、入力は search-box を再利用 #}
+
+            <div class="filter-tabs">
+                <span class="filter-tab active">
+                    {{ '新規登録' if mode == 'create' else '編集' }}
+                </span>
+            </div>
+
+            <div class="list-actions">
+                <div class="search-box">
+                    <input type="text"
+                           name="student_number"
+                           placeholder="学籍番号（例: K24039）"
+                           value="{% if grade is defined %}{{ grade.student_number }}{% else %}{{ request.form.get('student_number','') }}{% endif %}"
+                           {% if mode == 'edit' %}readonly{% endif %}>
+                </div>
+
+                <div class="search-box">
+                    <input type="number"
+                           name="subject_id"
+                           placeholder="科目ID（例: 1）"
+                           value="{% if grade is defined %}{{ grade.subject_id }}{% else %}{{ request.form.get('subject_id','') }}{% endif %}"
+                           {% if mode == 'edit' %}readonly{% endif %}>
+                </div>
+
+                <div class="search-box">
+                    <input type="number"
+                           name="unit"
+                           min="0"
+                           placeholder="単位（例: 2）"
+                           value="{% if grade is defined %}{{ grade.unit }}{% else %}{{ request.form.get('unit','') }}{% endif %}">
+                </div>
+
+                <div class="search-box">
+                    <input type="number"
+                           name="score"
+                           min="0"
+                           max="100"
+                           placeholder="評価（0〜100）（例: 85）"
+                           value="{% if grade is defined %}{{ grade.score }}{% else %}{{ request.form.get('score','') }}{% endif %}">
+                </div>
+
+                <button type="submit" class="btn-add">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M12 5v14M5 12h14"></path>
+                    </svg>
+                    {{ '登録' if mode == 'create' else '更新' }}
+                </button>
+            </div>
+
+        </form>
+
+    </div>
+{% endblock %}
