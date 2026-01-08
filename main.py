@@ -2,6 +2,8 @@ from flask import Flask, render_template, request, redirect, url_for, session, a
 import datetime
 from config import Config
 from routes import blueprints
+from utils import db
+from models import Grade
 
 
 app = Flask(__name__)
@@ -47,5 +49,22 @@ def dashboard(role_type):
                          current_date=current_date,
                          active_page='dashboard')
 
+@app.route('/grades')
+def grades_redirect():
+    return redirect(url_for('grade.list', role_type='teacher'))  # デフォルトを教員にする例
+
+@app.route('/grades/<role_type>')
+def grades_role(role_type):
+    if role_type not in Config.ROLE_TITLES:
+        abort(404)
+    return redirect(url_for('grade.list', role_type=role_type))
+
+
+def initialize_database():
+    db.connect(reuse_if_open=True)
+    db.create_tables([Grade], safe=True)  # safe=True で「既にあれば作らない」
+    db.close()
+
 if __name__ == '__main__':
+    initialize_database()
     app.run(host=Config.HOST, port=Config.PORT, debug=Config.DEBUG)

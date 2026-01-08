@@ -15,7 +15,7 @@
         </div>
 
         <div class="list-actions">
-            <a href="{{ url_for('grade.list') }}" class="action-link edit-link">
+            <a href="{{ url_for('grade.list', role_type=role_type) }}" class="action-link edit-link">
                 一覧に戻る
             </a>
         </div>
@@ -32,12 +32,10 @@
 
         <form method="POST"
               action="{% if mode == 'edit' and grade is defined %}
-                          {{ url_for('grade.edit', student_number=grade.student_number, subject_id=grade.subject_id) }}
+                          {{ url_for('grade.edit', role_type=role_type, student_number=grade.student_number, subject_id=grade.subject_id) }}
                       {% else %}
-                          {{ url_for('grade.create') }}
+                          {{ url_for('grade.create', role_type=role_type) }}
                       {% endif %}">
-
-            {# 既存CSSだけで整えるため、入力は search-box を再利用 #}
 
             <div class="filter-tabs">
                 <span class="filter-tab active">
@@ -49,7 +47,7 @@
                 <div class="search-box">
                     <input type="text"
                            name="student_number"
-                           placeholder="学籍番号（例: K24039）"
+                           placeholder="学籍番号（例: K24000）"
                            value="{% if grade is defined %}{{ grade.student_number }}{% else %}{{ request.form.get('student_number','') }}{% endif %}"
                            {% if mode == 'edit' %}readonly{% endif %}>
                 </div>
@@ -74,8 +72,8 @@
                     <input type="number"
                            name="score"
                            min="0"
-                           max="100"
-                           placeholder="評価（0〜100）（例: 85）"
+                           max="4"
+                           placeholder="評価（0〜4）"
                            value="{% if grade is defined %}{{ grade.score }}{% else %}{{ request.form.get('score','') }}{% endif %}">
                 </div>
 
