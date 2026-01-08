@@ -6,7 +6,7 @@ SECRET_KEY = "secret_key"
 
 def load_current_user():
     """
-    JWTからログイン中ユーザーを取得し g.current_user に設定
+    JWTからログイン中ユーザーを取得し g.current_user に設定する。
     """
     g.current_user = None
 
