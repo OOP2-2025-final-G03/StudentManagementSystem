@@ -1,10 +1,10 @@
-{% extends "dashboard/dash_base.html" %}
+{% extends "content_base.html" %}
 
 {% block page_title %}
 {{ 'ユーザー編集' if user else 'ユーザー新規登録' }}
 {% endblock %}
 
-{% block dashboard_content %}
+{% block main_content %}
 <div class="dashboard-card">
   <h2>{{ 'ユーザー編集' if user else 'ユーザー新規登録' }}</h2>
 
