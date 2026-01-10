@@ -1,9 +1,8 @@
-from flask import Blueprint, render_template, request, current_app, abort
+from flask import Blueprint, render_template, request, current_app, abort, g, jsonify, flash, redirect, url_for
+import datetime
 from models.user import User
 from models.password import Password
 from utils.decorators import login_required, role_required
-from flask import Blueprint, render_template, request, current_app, abort, g, jsonify
-import datetime
 
 users_bp = Blueprint('user', __name__, url_prefix='/user')
 
@@ -144,6 +143,55 @@ def delete_user():
 
     user.delete_instance(recursive=True)
     return jsonify({'message': 'ユーザーが削除されました'})
+
+# =====================
+# ユーザー新規作成フォーム表示
+# =====================
+@users_bp.route('/new', methods=['GET'])
+@login_required
+@role_required('superuser')
+def new_user_form():    
+    return render_template("user/user_form.html",
+                           active_template='dashboard/admin.html',
+                           user=None,
+                           role='admin', 
+                           active_page='users',
+                           user_role_name=current_app.config['ROLE_TITLES']['admin'],
+                           title='ユーザー新規登録',
+                           current_date=datetime.datetime.now().strftime('%Y年%m月%d日')) 
+
+# =====================
+#  ユーザー編集フォーム表示
+# =====================
+@users_bp.route('/<int:user_id>/edit')
+@login_required
+@role_required('superuser')
+def edit(user_id):
+    user = User.get_by_id(user_id)
+    return render_template('user/user_form.html',
+                            user=user
+    )
+
+# =====================
+# 更新処理
+# =====================
+@users_bp.route('/<int:user_id>/edit', methods=['POST'])
+@login_required
+@role_required('superuser')
+def update(user_id):
+    user = User.get_by_id(user_id)
+
+    user.name = request.form['name']
+    user.role = request.form['role']
+    user.save()
+
+    password = request.form.get('password')
+    if password:
+        Password.update_password(user, password)
+
+    flash('ユーザー情報を更新しました')
+    return redirect(url_for('user.list'))
+  
 
 # =====================
 # 学生一覧（教師・管理者）

@@ -5,6 +5,9 @@ document.addEventListener("DOMContentLoaded", () => {
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
+    const mode = form.dataset.mode;        // create / edit
+    const userId = form.dataset.userId;    // 編集時のみ
+
     const data = {
       user_id: document.getElementById("user_id").value,
       name: document.getElementById("name").value,
@@ -14,8 +17,12 @@ document.addEventListener("DOMContentLoaded", () => {
       password: document.getElementById("password").value
     };
 
+    const url = mode === "edit"
+      ? `/users/${userId}/edit`
+      : `/users/create`;
+
     try {
-      const res = await fetch("user/create", {
+      const res = await fetch(url, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -28,12 +35,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (!res.ok) {
         const errorMsg =
-            result.description || result.error || "登録に失敗しました";
+          result.description || result.error || "処理に失敗しました";
         throw new Error(errorMsg);
       }
 
-      document.getElementById("message").textContent = "ユーザーを登録しました";
-      form.reset();
+      document.getElementById("message").textContent =
+        mode === "edit"
+          ? "ユーザー情報を更新しました"
+          : "ユーザーを登録しました";
+
+      if (mode === "create") {
+        form.reset();
+      }
 
     } catch (err) {
       document.getElementById("message").textContent = err.message;

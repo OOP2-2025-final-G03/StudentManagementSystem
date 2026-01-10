@@ -1,48 +1,69 @@
 {% extends "dashboard/dash_base.html" %}
 
-{% block page_title %}新規登録{% endblock %}
+{% block page_title %}
+{{ 'ユーザー編集' if user else 'ユーザー新規登録' }}
+{% endblock %}
 
 {% block dashboard_content %}
 <div class="dashboard-card">
-  <h2>新規登録</h2>
+  <h2>{{ 'ユーザー編集' if user else 'ユーザー新規登録' }}</h2>
 
-  <form id="user-form">
+  <form id="user-form"
+        data-mode="{{ 'edit' if user else 'create' }}"
+        {% if user %}data-user-id="{{ user.id }}"{% endif %}>
+
     <div class="form-group">
       <label for="user_id">ユーザーID</label>
-      <input type="text" id="user_id" required>
+      <input type="text"
+             id="user_id"
+             value="{{ user.user_id if user else '' }}"
+             {{ 'readonly' if user else 'required' }}>
     </div>
 
     <div class="form-group">
       <label for="name">名前</label>
-      <input type="text" id="name" required>
+      <input type="text"
+             id="name"
+             value="{{ user.name if user else '' }}"
+             required>
     </div>
 
     <div class="form-group">
       <label for="birth_date">生年月日</label>
-      <input type="date" id="birth_date">
+      <input type="date"
+             id="birth_date"
+             value="{{ user.birth_date if user else '' }}">
     </div>
 
     <div class="form-group">
       <label for="role">権限</label>
       <select id="role" required>
         <option value="">選択してください</option>
-        <option value="student">学生</option>
-        <option value="teacher">教師</option>
-        <option value="superuser">スーパーユーザー</option>
+        <option value="student" {{ 'selected' if user and user.role=='student' }}>学生</option>
+        <option value="teacher" {{ 'selected' if user and user.role=='teacher' }}>教師</option>
+        <option value="superuser" {{ 'selected' if user and user.role=='superuser' }}>スーパーユーザー</option>
       </select>
     </div>
 
     <div class="form-group">
       <label for="department">所属（学科・専攻）</label>
-      <input type="text" id="department">
+      <input type="text"
+             id="department"
+             value="{{ user.department if user else '' }}">
     </div>
 
     <div class="form-group">
-      <label for="password">初期パスワード</label>
-      <input type="password" id="password" required>
+      <label for="password">
+        {{ '新しいパスワード（変更する場合のみ）' if user else '初期パスワード' }}
+      </label>
+      <input type="password"
+             id="password"
+             {{ 'required' if not user }}>
     </div>
 
-    <button type="submit">登録</button>
+    <button type="submit">
+      {{ '更新' if user else '登録' }}
+    </button>
   </form>
 
   <p id="message" class="message"></p>
@@ -50,5 +71,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="/static/js/users.js"></script>
+<script src="{{ url_for('static', filename='js/users.js') }}"></script>
 {% endblock %}
