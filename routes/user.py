@@ -91,8 +91,8 @@ def user_detail():
 # ユーザー作成
 # =====================
 @users_bp.route('/create', methods=['POST'])
-@login_required
-@role_required('superuser')
+#@login_required
+#@role_required('superuser')
 def create_user():
     data = request.json
 
@@ -112,8 +112,8 @@ def create_user():
 # ユーザー更新
 # =====================
 @users_bp.route('/update', methods=['POST'])
-@login_required
-@role_required('superuser')
+#@login_required
+#@role_required('superuser')
 def update_user():
     data = request.json
 
@@ -132,8 +132,8 @@ def update_user():
 # ユーザー削除
 # =====================
 @users_bp.route('/delete', methods=['POST'])
-@login_required
-@role_required('superuser')
+#@login_required
+#@role_required('superuser')
 def delete_user():
     data = request.json
 
@@ -148,8 +148,8 @@ def delete_user():
 # ユーザー新規作成フォーム表示
 # =====================
 @users_bp.route('/new', methods=['GET'])
-@login_required
-@role_required('superuser')
+#@login_required
+#@role_required('superuser')
 def new_user_form():    
     return render_template("user/user_form.html",
                            active_template='dashboard/admin.html',
@@ -163,9 +163,9 @@ def new_user_form():
 # =====================
 #  ユーザー編集フォーム表示
 # =====================
-@users_bp.route('/<int:user_id>/edit')
-@login_required
-@role_required('superuser')
+@users_bp.route('/<string:user_id>/edit')
+#@login_required
+#@role_required('superuser')
 def edit(user_id):
     user = User.get_by_id(user_id)
     return render_template('user/user_form.html',
@@ -175,9 +175,9 @@ def edit(user_id):
 # =====================
 # 更新処理
 # =====================
-@users_bp.route('/<int:user_id>/edit', methods=['POST'])
-@login_required
-@role_required('superuser')
+@users_bp.route('/<string:user_id>/edit', methods=['POST'])
+#@login_required
+#@role_required('superuser')
 def update(user_id):
     user = User.get_by_id(user_id)
 
@@ -197,8 +197,8 @@ def update(user_id):
 # 学生一覧（教師・管理者）
 # =====================
 @users_bp.route('/students', methods=['GET'])
-@login_required
-@role_required('teacher', 'superuser')
+#@login_required
+#@role_required('teacher', 'superuser')
 def list_students():
     students = User.select().where(User.role == 'student')
     return jsonify([s.to_dict() for s in students])
